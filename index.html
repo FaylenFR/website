@@ -1,145 +1,490 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal | Infra & Réseaux</title>
-    <style>
-        body {
-            background-color: #0c0c0c;
-            color: #cccccc;
-            font-family: 'Courier New', Courier, monospace;
-            margin: 0;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-        #terminal {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .prompt {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        .path {
-            color: #2196F3;
-            font-weight: bold;
-        }
-        .command-line {
-            display: flex;
-            margin-top: 5px;
-        }
-        input {
-            background: transparent;
-            border: none;
-            color: #cccccc;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            flex-grow: 1;
-            outline: none;
-            margin-left: 8px;
-        }
-        .output {
-            margin-top: 5px;
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-            line-height: 1.4;
-        }
-        .highlight {
-            color: #ffeb3b;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucas — Technicien Systèmes &amp; Réseaux | rasolo.fr</title>
+<meta name="description" content="Technicien Systèmes &amp; Réseaux (Bac+2) basé en Île-de-France. Support N1/N2, VoIP, infrastructures réseau, déploiement NAS. Disponible pour missions et postes.">
+<meta name="theme-color" content="#0a0806">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lucas — Technicien Systèmes &amp; Réseaux">
+<meta property="og:description" content="Support N1/N2, VoIP, infrastructures réseau, NAS. Disponible pour missions et postes en Île-de-France.">
+<meta property="og:url" content="https://rasolo.fr">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0a0806;
+    --bg-raised:#120e09;
+    --fg:#d8cdb8;
+    --fg-dim:#8a8070;
+    --amber:#ffb000;
+    --amber-dim:#b37700;
+    --err:#ff6b5e;
+    --ok:#8fd694;
+    --border:#2a2318;
+    --radius:3px;
+  }
+
+  *{box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    margin:0;
+    min-height:100vh;
+    line-height:1.55;
+    background-image:
+      radial-gradient(ellipse at 50% -10%, rgba(255,176,0,0.06), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+  }
+
+  /* ---------- Accessible / crawlable content (real, not decorative) ---------- */
+  .visually-hidden{
+    position:absolute;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+  .visually-hidden h1,
+  .visually-hidden h2{font-size:1em;}
+
+  /* ---------- Skip link ---------- */
+  .skip-link{
+    position:absolute;
+    left:8px; top:-40px;
+    background:var(--amber);
+    color:#0a0806;
+    padding:8px 12px;
+    border-radius:var(--radius);
+    z-index:100;
+    transition:top .15s ease;
+    font-weight:600;
+    text-decoration:none;
+  }
+  .skip-link:focus{top:8px;}
+
+  header.top{
+    max-width:860px;
+    margin:0 auto;
+    padding:28px 20px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:var(--fg-dim);
+    font-size:13px;
+  }
+  header.top .dot{
+    display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:var(--ok); margin-right:6px;
+    box-shadow:0 0 6px var(--ok);
+  }
+
+  main{
+    max-width:860px;
+    margin:0 auto;
+    padding:20px;
+  }
+
+  #terminal{
+    background:var(--bg-raised);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:22px 22px 18px;
+    box-shadow:0 20px 60px -20px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.25);
+    min-height:70vh;
+  }
+
+  .titlebar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:-22px -22px 16px;
+    padding:10px 14px;
+    border-bottom:1px solid var(--border);
+    color:var(--fg-dim);
+    font-size:12px;
+  }
+  .titlebar .tl-dot{width:10px;height:10px;border-radius:50%;background:#3a3226;}
+  .titlebar span.name{margin-left:6px;}
+
+  #log{white-space:pre-wrap;word-break:break-word;}
+
+  .line{margin:0 0 2px;}
+  .boot{color:var(--fg-dim);}
+  .boot .ok{color:var(--ok);}
+
+  .row{display:flex; gap:8px; margin-top:6px;}
+  .prompt{color:var(--amber); font-weight:600; white-space:nowrap;}
+  .path{color:#7fb3ff; font-weight:600;}
+
+  .echoed{margin:6px 0 0;}
+  .output{margin:2px 0 14px; color:var(--fg);}
+  .output .hi{color:#ffe08a;}
+  .output .err{color:var(--err);}
+  .output .ok{color:var(--ok);}
+  .output .dim{color:var(--fg-dim);}
+
+  form.cmdline{display:flex; align-items:center; gap:8px; margin-top:8px;}
+  input#cmd{
+    background:transparent;
+    border:none;
+    color:var(--fg);
+    font:inherit;
+    font-size:15px;
+    flex:1;
+    outline:none;
+    caret-color:var(--amber);
+  }
+  input#cmd::placeholder{color:#4a4032;}
+
+  /* visible focus, kept intentional */
+  input#cmd:focus-visible{
+    outline:1px dashed var(--amber-dim);
+    outline-offset:4px;
+  }
+
+  .hint{color:var(--fg-dim); font-size:12px; margin-top:14px;}
+  .hint kbd{
+    background:#1b1610; border:1px solid var(--border); border-radius:3px;
+    padding:1px 6px; font-size:11px; color:var(--fg);
+  }
+
+  /* quick command chips — mobile-friendly alternative to typing */
+  .chips{
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed var(--border);
+  }
+  .chip{
+    background:#1b1610;
+    border:1px solid var(--border);
+    color:var(--fg);
+    font:inherit;
+    font-size:12.5px;
+    padding:6px 11px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .chip:hover, .chip:focus-visible{border-color:var(--amber-dim); color:var(--amber);}
+
+  footer{
+    max-width:860px; margin:0 auto; padding:18px 20px 40px;
+    color:var(--fg-dim); font-size:12px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  footer a{color:var(--fg-dim);}
+  footer a:hover{color:var(--amber);}
+
+  @media (max-width:600px){
+    header.top{padding:18px 14px 0; font-size:11px;}
+    main{padding:14px;}
+    #terminal{padding:16px 14px 14px; min-height:60vh;}
+    .titlebar{margin:-16px -14px 14px;}
+    input#cmd{font-size:16px;} /* avoid iOS zoom on focus */
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+</style>
 </head>
 <body>
 
-    <div id="terminal">
-        <div>Initialisation de l'environnement sécurisé... OK.</div>
-        <div>Tapez <span class="highlight">help</span> pour voir les commandes disponibles.</div>
-        <div id="history"></div>
-        
-        <div class="command-line">
-            <span class="prompt">guest@rasolo</span>:<span class="path">~</span>$ 
-            <input type="text" id="cmd" autocomplete="off" autofocus>
-        </div>
+<a class="skip-link" href="#cmd">Aller au terminal</a>
+
+<!--
+  Contenu réel, sémantique, visible pour les moteurs de recherche et les
+  lecteurs d'écran. Le terminal ci-dessous en est une couche interactive,
+  pas la seule porte d'entrée vers l'information.
+-->
+<div class="visually-hidden">
+  <h1>Lucas — Technicien Systèmes &amp; Réseaux, Île-de-France</h1>
+  <p>Technicien Systèmes &amp; Réseaux diplômé Bac+2 (BTS SIO, décembre 2024), basé en Île-de-France.
+  Environ 14 mois d'expérience en alternance sur le support N1/N2, la téléphonie VoIP et la répartition
+  de charge WAN. Disponible pour un poste ou des missions freelance en infrastructure et support informatique.</p>
+
+  <h2>Compétences</h2>
+  <ul>
+    <li>Support informatique N1 / N2, diagnostic et résolution d'incidents</li>
+    <li>Téléphonie VoIP et répartition de charge sur liens WAN</li>
+    <li>Déploiement et administration de NAS Synology (DSM)</li>
+    <li>Configuration et dépannage d'imprimantes et scanners réseau</li>
+    <li>Assistance à distance auprès de clients</li>
+    <li>Homelab personnel : virtualisation Proxmox, conteneurs Docker, VPN WireGuard, DNS AdGuard Home</li>
+  </ul>
+
+  <h2>Expérience</h2>
+  <p>Alternance d'environ 14 mois en support N1/N2, VoIP et infrastructure réseau chez Buropartner SAS.
+  Intervention terrain en tant que technicien informatique : configuration de matériel réseau, déploiement
+  de NAS chez des clients, support et dépannage à distance.</p>
+
+  <h2>Contact</h2>
+  <p>Pour toute proposition professionnelle : <a href="mailto:contact@rasolo.fr">contact@rasolo.fr</a></p>
+</div>
+
+<header class="top" aria-hidden="true">
+  <span><span class="dot"></span>rasolo.fr — session active</span>
+  <span id="clock"></span>
+</header>
+
+<main>
+  <div id="terminal" role="application" aria-label="Terminal interactif — portfolio de Lucas">
+    <div class="titlebar" aria-hidden="true">
+      <span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span>
+      <span class="name">guest@rasolo — bash — 80×24</span>
     </div>
 
-    <script>
-        const inputField = document.getElementById('cmd');
-        const historyDiv = document.getElementById('history');
+    <div id="log" aria-live="polite">
+      <div class="line boot">Initialisation de l'environnement… <span class="ok">OK</span></div>
+      <div class="line boot">Chargement du profil guest… <span class="ok">OK</span></div>
+      <div class="line boot">Tapez <span class="output hi" style="display:inline">help</span> pour voir les commandes, ou touchez un bouton ci-dessous sur mobile.</div>
+    </div>
 
-        // Base de données des commandes
-        const commands = {
-            'help': `Commandes disponibles :
-  - <span class="highlight">whoami</span>   : Affiche l'identité professionnelle
-  - <span class="highlight">skills</span>   : Liste les compétences techniques (N1/N2, Infra)
-  - <span class="highlight">projects</span> : Affiche les déploiements récents
-  - <span class="highlight">contact</span>  : Affiche les moyens de communication
-  - <span class="highlight">clear</span>    : Nettoie le terminal`,
-            
-            'whoami': `Rôle     : Technicien Systèmes & Réseaux
-Localité : Île-de-France
-Statut   : Diplômé Bac+2 (2024)
-Mission  : Garantir la stabilité, la sécurité et la performance des infrastructures matérielles et logicielles.`,
-            
-            'skills': `[Réseau & Connectivité]
-- Optimisation des topologies réseau (assainissement des canaux, architectures centralisées de type Livebox 7)
-- Gestion et diagnostic de pannes réseaux
+    <form class="cmdline" id="cmdForm" autocomplete="off">
+      <span class="prompt">guest@rasolo</span><span class="path">:~$</span>
+      <label class="visually-hidden" for="cmd">Tapez une commande</label>
+      <input type="text" id="cmd" name="cmd" placeholder="help" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus>
+    </form>
 
-[Systèmes & Serveurs]
-- Support informatique N1 / N2
-- Administration de NAS (ex: Synology DSM 7) et automatisation des relances de services
-- Déploiement d'environnements proxy (Velocity) et gestion d'instances d'exécution (OpenJDK)
+    <div class="chips" aria-label="Commandes rapides">
+      <button type="button" class="chip" data-cmd="neofetch">neofetch</button>
+      <button type="button" class="chip" data-cmd="whoami">whoami</button>
+      <button type="button" class="chip" data-cmd="skills">skills</button>
+      <button type="button" class="chip" data-cmd="experience">experience</button>
+      <button type="button" class="chip" data-cmd="contact">contact</button>
+      <button type="button" class="chip" data-cmd="clear">clear</button>
+    </div>
 
-[Matériel & OS]
-- Déploiement OS vierges et exécution de scripts de debloating (ex: Winhance)
-- Montage, maintenance et optimisation de configurations haute-fidélité (diagnostics CPU/GPU, gestion des périphériques à fort couple de type Direct Drive 12Nm).`,
+    <div class="hint">
+      <kbd>↑</kbd> <kbd>↓</kbd> historique · <kbd>Tab</kbd> autocomplétion · <kbd>Entrée</kbd> exécuter
+    </div>
+  </div>
+</main>
 
-            'projects': `> Exécution du script de requêtes des projets récents...
+<footer>
+  <span>rasolo.fr</span>
+  <span><a href="mailto:contact@rasolo.fr">contact@rasolo.fr</a></span>
+</footer>
 
-1. Automatisation NAS : Écriture d'un script shell exploitant les sockets réseau pour monitorer et forcer le redémarrage de paquets figés en arrière-plan.
-2. Architecture Serveur : Déploiement, optimisation de la RAM et sécurisation de réseaux multi-instances.
-3. Rationalisation Réseau : Démantèlement d'architectures mesh instables au profit d'une passerelle autonome robuste.`,
-            
-            'contact': `Pour toute proposition professionnelle, vous pouvez me contacter sur l'adresse associée à ce domaine : 
-<span class="highlight">contact@rasolo.fr</span>`,
-        };
+<script>
+(function(){
+  "use strict";
 
-        inputField.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                const cmd = this.value.trim().toLowerCase();
-                this.value = '';
+  var logEl = document.getElementById('log');
+  var input = document.getElementById('cmd');
+  var form = document.getElementById('cmdForm');
+  var clock = document.getElementById('clock');
 
-                if (cmd === 'clear') {
-                    historyDiv.innerHTML = '';
-                    return;
-                }
+  var history = [];
+  var histIndex = -1;
 
-                // Génération de l'affichage de la commande tapée
-                const promptLine = document.createElement('div');
-                promptLine.innerHTML = `<span class="prompt">guest@rasolo</span>:<span class="path">~</span>$ ${cmd}`;
-                historyDiv.appendChild(promptLine);
+  function escapeHTML(str){
+    return str.replace(/[&<>"']/g, function(c){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
 
-                // Génération de la réponse
-                const responseLine = document.createElement('div');
-                responseLine.className = 'output';
-                
-                if (cmd === '') {
-                    responseLine.innerHTML = '';
-                } else if (commands[cmd]) {
-                    responseLine.innerHTML = commands[cmd];
-                } else {
-                    responseLine.innerHTML = `bash: ${cmd}: commande introuvable`;
-                }
+  function tick(){
+    var now = new Date();
+    var pad = function(n){ return n < 10 ? '0'+n : n; };
+    clock.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
 
-                historyDiv.appendChild(responseLine);
-                window.scrollTo(0, document.body.scrollHeight);
-            }
-        });
+  var NEOFETCH = [
+    '     ___         ',
+    '    /  /\\        ' + wrap('guest@rasolo'),
+    '   /  /  \\       ' + wrap('------------'),
+    '  /__/____\\      ' + field('OS', 'BTS SIO — Bac+2 (déc. 2024)'),
+    ' |  ||  ||  |     ' + field('Host', 'Île-de-France, FR'),
+    ' |__||__||__|     ' + field('Rôle', 'Technicien Systèmes &amp; Réseaux'),
+    '                  ' + field('Uptime', '~14 mois d\'expérience (alternance)'),
+    '                  ' + field('Shell', 'Support N1 / N2'),
+    '                  ' + field('Spécialités', 'VoIP · WAN · NAS Synology'),
+    '                  ' + field('Homelab', 'Proxmox · Docker · WireGuard · AdGuard'),
+    '                  ' + field('Statut', '<span class="ok">disponible</span> — poste &amp; missions'),
+  ].join('\n');
 
-        // Garder le focus sur l'input
-        document.addEventListener('click', () => {
-            inputField.focus();
-        });
-    </script>
+  function wrap(s){ return '<span class="hi">'+s+'</span>'; }
+  function field(k, v){ return '<span class="dim">'+k+':</span> '+v; }
+
+  var COMMANDS = {
+    help: function(){
+      return (
+'Commandes disponibles :\n'+
+'  <span class="hi">neofetch</span>     fiche système / à propos\n'+
+'  <span class="hi">whoami</span>       identité professionnelle\n'+
+'  <span class="hi">skills</span>       compétences techniques\n'+
+'  <span class="hi">experience</span>   parcours &amp; alternance\n'+
+'  <span class="hi">projects</span>     réalisations récentes\n'+
+'  <span class="hi">contact</span>      me contacter\n'+
+'  <span class="hi">ping</span> [cible] tester une connexion (pour rire)\n'+
+'  <span class="hi">clear</span>        vider le terminal'
+      );
+    },
+
+    neofetch: function(){ return NEOFETCH; },
+
+    whoami: function(){
+      return (
+'Rôle      : Technicien Systèmes &amp; Réseaux\n'+
+'Diplôme   : BTS SIO (Bac+2) — décembre 2024\n'+
+'Localité  : Île-de-France, France\n'+
+'Statut    : <span class="ok">disponible</span> — recherche de poste + missions freelance\n'+
+'Mission   : garantir la stabilité, la sécurité et la performance des infrastructures.'
+      );
+    },
+
+    skills: function(){
+      return (
+'<span class="hi">[Réseau]</span>\n'+
+'  Téléphonie VoIP, répartition de charge WAN, diagnostic réseau\n\n'+
+'<span class="hi">[Systèmes]</span>\n'+
+'  Support N1 / N2, NAS Synology (DSM), assistance à distance\n\n'+
+'<span class="hi">[Terrain]</span>\n'+
+'  Configuration imprimantes &amp; scanners, déploiement matériel client\n\n'+
+'<span class="hi">[Homelab perso]</span>\n'+
+'  Proxmox, Docker, WireGuard, AdGuard Home (DNS)'
+      );
+    },
+
+    experience: function(){
+      return (
+'2023 — 2024  Alternance Technicien Systèmes &amp; Réseaux — Buropartner SAS\n'+
+'             Support N1/N2, VoIP, répartition de charge WAN (~14 mois)\n\n'+
+'Déc. 2024    Obtention du BTS SIO (Bac+2)\n\n'+
+'2025 — auj.  Technicien terrain freelance\n'+
+'             NAS Synology, configuration imprimantes/scanners, support client à distance'
+      );
+    },
+
+    projects: function(){
+      return (
+'1. Déploiements NAS Synology chez plusieurs clients (config, sauvegardes, accès distant)\n'+
+'2. Architecture réseau homelab : virtualisation Proxmox, conteneurs Docker, VPN WireGuard\n'+
+'3. Filtrage DNS &amp; supervision réseau via AdGuard Home\n'+
+'4. Support VoIP et optimisation de liens WAN en environnement pro'
+      );
+    },
+
+    contact: function(){
+      return (
+'Email     : <a href="mailto:contact@rasolo.fr" style="color:inherit;text-decoration:underline;">contact@rasolo.fr</a>\n'+
+'Disponible pour : poste en systèmes/réseaux, missions freelance IT terrain.'
+      );
+    },
+
+    sudo: function(){
+      return '<span class="err">Permission refusée</span> : guest n\'est pas dans le fichier sudoers.\nCet incident sera signalé. (Tapez <span class="hi">contact</span> pour une demande légitime.)';
+    },
+
+    ping: function(arg){
+      var target = (arg || 'contact@rasolo.fr').trim();
+      return (
+'PING '+escapeHTML(target)+' : 3 paquets envoyés…\n'+
+'<span class="ok">réponse reçue en ~0ms — disponibilité confirmée</span>'
+      );
+    }
+  };
+
+  function printBlock(html, cls){
+    var div = document.createElement('div');
+    div.className = cls || 'output';
+    div.innerHTML = html;
+    logEl.appendChild(div);
+  }
+
+  function runCommand(raw){
+    var trimmed = raw.trim();
+    var lower = trimmed.toLowerCase();
+    var parts = lower.split(/\s+/);
+    var name = parts[0];
+    var arg = trimmed.slice(name.length).trim();
+
+    // echo typed line (escaped — no raw HTML injection from user input)
+    var echo = document.createElement('div');
+    echo.className = 'line echoed';
+    echo.innerHTML = '<span class="prompt">guest@rasolo</span><span class="path">:~$</span> ' + escapeHTML(trimmed);
+    logEl.appendChild(echo);
+
+    if (trimmed === ''){ return; }
+
+    if (name === 'clear'){
+      logEl.innerHTML = '';
+      return;
+    }
+
+    if (COMMANDS[name]){
+      printBlock(COMMANDS[name](arg));
+    } else {
+      printBlock('bash: '+escapeHTML(name)+' : commande introuvable. Tapez <span class="hi">help</span>.', 'output err');
+    }
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var val = input.value;
+    if (val.trim() !== ''){
+      history.push(val);
+      histIndex = history.length;
+    }
+    input.value = '';
+    runCommand(val);
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+
+  input.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowUp'){
+      if (histIndex > 0){ histIndex--; input.value = history[histIndex]; }
+      e.preventDefault();
+    } else if (e.key === 'ArrowDown'){
+      if (histIndex < history.length - 1){ histIndex++; input.value = history[histIndex]; }
+      else { histIndex = history.length; input.value = ''; }
+      e.preventDefault();
+    } else if (e.key === 'Tab'){
+      var partial = input.value.toLowerCase();
+      if (partial){
+        var match = Object.keys(COMMANDS).find(function(c){ return c.indexOf(partial) === 0; });
+        if (match){ input.value = match; }
+      }
+      e.preventDefault();
+    }
+  });
+
+  // quick command chips (mobile / discoverability)
+  document.querySelectorAll('.chip').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var c = btn.getAttribute('data-cmd');
+      input.value = c;
+      history.push(c); histIndex = history.length;
+      runCommand(c);
+      input.focus();
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  });
+
+  // refocus the input on click, but never steal an active text selection
+  document.addEventListener('click', function(e){
+    var selection = window.getSelection().toString();
+    if (selection.length === 0 && e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON'){
+      input.focus();
+    }
+  });
+
+})();
+</script>
 </body>
 </html>
