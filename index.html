@@ -212,24 +212,39 @@
 -->
 <div class="visually-hidden">
   <h1>Lucas — Technicien Systèmes &amp; Réseaux, Île-de-France</h1>
-  <p>Technicien Systèmes &amp; Réseaux diplômé Bac+2 (BTS SIO, décembre 2024), basé en Île-de-France.
-  Environ 14 mois d'expérience en alternance sur le support N1/N2, la téléphonie VoIP et la répartition
-  de charge WAN. Disponible pour un poste ou des missions freelance en infrastructure et support informatique.</p>
+  <p>Technicien Systèmes &amp; Réseaux en formation, basé en Île-de-France, opérationnel en support
+  utilisateurs (N1/N2) et exploitation d'infrastructures. Habitué aux environnements techniques exigeants
+  (Proxmox, Docker, Active Directory) grâce à une pratique quotidienne en homelab. Titulaire du permis B,
+  véhiculé. Recherche des missions techniques pour mettre à profit sa polyvalence et sa réactivité immédiate.</p>
 
   <h2>Compétences</h2>
   <ul>
-    <li>Support informatique N1 / N2, diagnostic et résolution d'incidents</li>
-    <li>Téléphonie VoIP et répartition de charge sur liens WAN</li>
-    <li>Déploiement et administration de NAS Synology (DSM)</li>
-    <li>Configuration et dépannage d'imprimantes et scanners réseau</li>
-    <li>Assistance à distance auprès de clients</li>
-    <li>Homelab personnel : virtualisation Proxmox, conteneurs Docker, VPN WireGuard, DNS AdGuard Home</li>
+    <li>Systèmes : Windows Server, Linux (Debian), Active Directory, CLI</li>
+    <li>Virtualisation : Proxmox VE, Docker, Portainer</li>
+    <li>Réseau : TCP/IP, DNS, VPN (WireGuard), pare-feu</li>
+    <li>Outils &amp; scripting : Python, Bash, GLPI, Office 365</li>
+    <li>Langues : Français (natif), Anglais (B1, Cambridge English), Espagnol (A2)</li>
   </ul>
 
   <h2>Expérience</h2>
-  <p>Alternance d'environ 14 mois en support N1/N2, VoIP et infrastructure réseau chez Buropartner SAS.
-  Intervention terrain en tant que technicien informatique : configuration de matériel réseau, déploiement
-  de NAS chez des clients, support et dépannage à distance.</p>
+  <p>Technicien informatique en alternance chez Buropartner SAS (octobre 2023 – décembre 2024) :
+  support N1/N2 (téléphone et mail), résolution d'incidents à distance et sur site, programmation VoIP
+  des téléphones fixes via OVHcloud, mise en service d'équipements IT, gestion de solutions de load
+  balancing et failover WAN pour assurer la continuité de service.
+  Stage technicien alarme et vidéosurveillance chez Enotech Sécurité (mai – juin 2018).</p>
+
+  <h2>Formation</h2>
+  <p>Titre professionnel Technicien Informatique et Réseau (niveau Bac+2) — Studi, octobre 2023 à décembre 2024,
+  cursus suivi : administration Windows/Linux, supervision, gestion d'incidents, sécurité.
+  Bachelor Numérique (niveau Bac+1) — ESAIP, septembre 2020 à juillet 2021, modules validés :
+  bases de données (SQL), virtualisation, réseaux TCP/IP, initiation développement web.
+  Bac technologique STI2D, spécialité systèmes d'information et numérique, session 2020.</p>
+
+  <h2>Homelab personnel</h2>
+  <p>Cluster Proxmox VE avec gestion de conteneurs LXC et VMs (Debian/Ubuntu), optimisation kernel Linux.
+  Orchestration Docker via Portainer et stacks Compose, auto-réparation (Autoheal) et mise à jour
+  automatique (Watchtower). VPN WireGuard pour accès distant, filtrage DNS réseau (AdGuard Home),
+  reverse proxy et certificats SSL. Déploiement de bots Python conteneurisés et automatisation de tâches.</p>
 
   <h2>Contact</h2>
   <p>Pour toute proposition professionnelle : <a href="mailto:contact@rasolo.fr">contact@rasolo.fr</a></p>
@@ -264,6 +279,8 @@
       <button type="button" class="chip" data-cmd="whoami">whoami</button>
       <button type="button" class="chip" data-cmd="skills">skills</button>
       <button type="button" class="chip" data-cmd="experience">experience</button>
+      <button type="button" class="chip" data-cmd="formation">formation</button>
+      <button type="button" class="chip" data-cmd="homelab">homelab</button>
       <button type="button" class="chip" data-cmd="contact">contact</button>
       <button type="button" class="chip" data-cmd="clear">clear</button>
     </div>
@@ -308,13 +325,14 @@
     '     ___         ',
     '    /  /\\        ' + wrap('guest@rasolo'),
     '   /  /  \\       ' + wrap('------------'),
-    '  /__/____\\      ' + field('OS', 'BTS SIO — Bac+2 (déc. 2024)'),
+    '  /__/____\\      ' + field('OS', 'Titre Pro Technicien Info. &amp; Réseau (Bac+2, Studi)'),
     ' |  ||  ||  |     ' + field('Host', 'Île-de-France, FR'),
     ' |__||__||__|     ' + field('Rôle', 'Technicien Systèmes &amp; Réseaux'),
-    '                  ' + field('Uptime', '~14 mois d\'expérience (alternance)'),
+    '                  ' + field('Uptime', 'Oct. 2023 – déc. 2024 (Buropartner SAS)'),
     '                  ' + field('Shell', 'Support N1 / N2'),
-    '                  ' + field('Spécialités', 'VoIP · WAN · NAS Synology'),
+    '                  ' + field('Spécialités', 'VoIP · WAN · Windows Server · AD'),
     '                  ' + field('Homelab', 'Proxmox · Docker · WireGuard · AdGuard'),
+    '                  ' + field('Permis', 'B — véhiculé'),
     '                  ' + field('Statut', '<span class="ok">disponible</span> — poste &amp; missions'),
   ].join('\n');
 
@@ -328,8 +346,9 @@
 '  <span class="hi">neofetch</span>     fiche système / à propos\n'+
 '  <span class="hi">whoami</span>       identité professionnelle\n'+
 '  <span class="hi">skills</span>       compétences techniques\n'+
-'  <span class="hi">experience</span>   parcours &amp; alternance\n'+
-'  <span class="hi">projects</span>     réalisations récentes\n'+
+'  <span class="hi">experience</span>   parcours professionnel\n'+
+'  <span class="hi">formation</span>    études &amp; certifications\n'+
+'  <span class="hi">homelab</span>      infra personnelle (Proxmox, Docker…)\n'+
 '  <span class="hi">contact</span>      me contacter\n'+
 '  <span class="hi">ping</span> [cible] tester une connexion (pour rire)\n'+
 '  <span class="hi">clear</span>        vider le terminal'
@@ -341,42 +360,66 @@
     whoami: function(){
       return (
 'Rôle      : Technicien Systèmes &amp; Réseaux\n'+
-'Diplôme   : BTS SIO (Bac+2) — décembre 2024\n'+
+'Formation : Titre Pro Technicien Informatique &amp; Réseau (niveau Bac+2, Studi)\n'+
 'Localité  : Île-de-France, France\n'+
+'Permis    : B — véhiculé\n'+
 'Statut    : <span class="ok">disponible</span> — recherche de poste + missions freelance\n'+
-'Mission   : garantir la stabilité, la sécurité et la performance des infrastructures.'
+'Profil    : polyvalent, réactif, opérationnel en support utilisateurs (N1/N2)\n'+
+'            et exploitation d\'infrastructures.'
       );
     },
 
     skills: function(){
       return (
-'<span class="hi">[Réseau]</span>\n'+
-'  Téléphonie VoIP, répartition de charge WAN, diagnostic réseau\n\n'+
 '<span class="hi">[Systèmes]</span>\n'+
-'  Support N1 / N2, NAS Synology (DSM), assistance à distance\n\n'+
-'<span class="hi">[Terrain]</span>\n'+
-'  Configuration imprimantes &amp; scanners, déploiement matériel client\n\n'+
-'<span class="hi">[Homelab perso]</span>\n'+
-'  Proxmox, Docker, WireGuard, AdGuard Home (DNS)'
+'  Windows Server, Linux (Debian), Active Directory, CLI\n\n'+
+'<span class="hi">[Virtualisation]</span>\n'+
+'  Proxmox VE, Docker, Portainer\n\n'+
+'<span class="hi">[Réseau]</span>\n'+
+'  TCP/IP, DNS, VPN (WireGuard), pare-feu\n\n'+
+'<span class="hi">[Outils &amp; scripting]</span>\n'+
+'  Python, Bash, GLPI, Office 365\n\n'+
+'<span class="hi">[Langues]</span>\n'+
+'  Français (natif) · Anglais (B1, Cambridge English) · Espagnol (A2)'
       );
     },
 
     experience: function(){
       return (
-'2023 — 2024  Alternance Technicien Systèmes &amp; Réseaux — Buropartner SAS\n'+
-'             Support N1/N2, VoIP, répartition de charge WAN (~14 mois)\n\n'+
-'Déc. 2024    Obtention du BTS SIO (Bac+2)\n\n'+
-'2025 — auj.  Technicien terrain freelance\n'+
-'             NAS Synology, configuration imprimantes/scanners, support client à distance'
+'Oct. 2023 — Déc. 2024\n'+
+'<span class="hi">Buropartner SAS</span> — Technicien informatique en alternance\n'+
+'  - Support N1/N2 (téléphone et mail), résolution d\'incidents à distance et sur site\n'+
+'  - Programmation VoIP des téléphones fixes via OVHcloud\n'+
+'  - Mise en service d\'équipements IT\n'+
+'  - Gestion de solutions de load balancing et failover WAN\n\n'+
+'Mai — Juin 2018\n'+
+'<span class="hi">Enotech Sécurité</span> — Stagiaire technicien alarme et vidéosurveillance'
       );
     },
 
-    projects: function(){
+    formation: function(){
       return (
-'1. Déploiements NAS Synology chez plusieurs clients (config, sauvegardes, accès distant)\n'+
-'2. Architecture réseau homelab : virtualisation Proxmox, conteneurs Docker, VPN WireGuard\n'+
-'3. Filtrage DNS &amp; supervision réseau via AdGuard Home\n'+
-'4. Support VoIP et optimisation de liens WAN en environnement pro'
+'Studi — Titre professionnel Technicien Informatique et Réseau (niveau Bac+2)\n'+
+'  Oct. 2023 — Déc. 2024\n'+
+'  Cursus suivi : administration Windows/Linux, supervision, gestion d\'incidents, sécurité.\n\n'+
+'ESAIP — Bachelor Numérique (niveau Bac+1)\n'+
+'  Sept. 2020 — Juil. 2021\n'+
+'  Modules validés : bases de données (SQL), virtualisation, réseaux TCP/IP, dév. web.\n\n'+
+'Bac technologique STI2D — spécialité systèmes d\'information et numérique\n'+
+'  Session 2020'
+      );
+    },
+
+    homelab: function(){
+      return (
+'<span class="hi">[Système]</span>\n'+
+'  Cluster Proxmox VE, conteneurs LXC et VMs (Debian/Ubuntu), optimisation kernel Linux\n\n'+
+'<span class="hi">[Docker &amp; DevOps]</span>\n'+
+'  Orchestration Portainer, stacks Compose, auto-réparation (Autoheal), MAJ auto (Watchtower)\n\n'+
+'<span class="hi">[Réseau &amp; sécurité]</span>\n'+
+'  VPN WireGuard, filtrage DNS (AdGuard Home), reverse proxy et certificats SSL\n\n'+
+'<span class="hi">[Scripting]</span>\n'+
+'  Bots Python conteneurisés, automatisation de tâches'
       );
     },
 
