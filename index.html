@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal | Infra & Réseaux</title>
+    <style>
+        body {
+            background-color: #0c0c0c;
+            color: #cccccc;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        #terminal {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .prompt {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .path {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .command-line {
+            display: flex;
+            margin-top: 5px;
+        }
+        input {
+            background: transparent;
+            border: none;
+            color: #cccccc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            flex-grow: 1;
+            outline: none;
+            margin-left: 8px;
+        }
+        .output {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        .highlight {
+            color: #ffeb3b;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="terminal">
+        <div>Initialisation de l'environnement sécurisé... OK.</div>
+        <div>Tapez <span class="highlight">help</span> pour voir les commandes disponibles.</div>
+        <div id="history"></div>
+        
+        <div class="command-line">
+            <span class="prompt">guest@rasolo</span>:<span class="path">~</span>$ 
+            <input type="text" id="cmd" autocomplete="off" autofocus>
+        </div>
+    </div>
+
+    <script>
+        const inputField = document.getElementById('cmd');
+        const historyDiv = document.getElementById('history');
+
+        // Base de données des commandes
+        const commands = {
+            'help': `Commandes disponibles :
+  - <span class="highlight">whoami</span>   : Affiche l'identité professionnelle
+  - <span class="highlight">skills</span>   : Liste les compétences techniques (N1/N2, Infra)
+  - <span class="highlight">projects</span> : Affiche les déploiements récents
+  - <span class="highlight">contact</span>  : Affiche les moyens de communication
+  - <span class="highlight">clear</span>    : Nettoie le terminal`,
+            
+            'whoami': `Rôle     : Technicien Systèmes & Réseaux
+Localité : Île-de-France
+Statut   : Diplômé Bac+2 (2024)
+Mission  : Garantir la stabilité, la sécurité et la performance des infrastructures matérielles et logicielles.`,
+            
+            'skills': `[Réseau & Connectivité]
+- Optimisation des topologies réseau (assainissement des canaux, architectures centralisées de type Livebox 7)
+- Gestion et diagnostic de pannes réseaux
+
+[Systèmes & Serveurs]
+- Support informatique N1 / N2
+- Administration de NAS (ex: Synology DSM 7) et automatisation des relances de services
+- Déploiement d'environnements proxy (Velocity) et gestion d'instances d'exécution (OpenJDK)
+
+[Matériel & OS]
+- Déploiement OS vierges et exécution de scripts de debloating (ex: Winhance)
+- Montage, maintenance et optimisation de configurations haute-fidélité (diagnostics CPU/GPU, gestion des périphériques à fort couple de type Direct Drive 12Nm).`,
+
+            'projects': `> Exécution du script de requêtes des projets récents...
+
+1. Automatisation NAS : Écriture d'un script shell exploitant les sockets réseau pour monitorer et forcer le redémarrage de paquets figés en arrière-plan.
+2. Architecture Serveur : Déploiement, optimisation de la RAM et sécurisation de réseaux multi-instances.
+3. Rationalisation Réseau : Démantèlement d'architectures mesh instables au profit d'une passerelle autonome robuste.`,
+            
+            'contact': `Pour toute proposition professionnelle, vous pouvez me contacter sur l'adresse associée à ce domaine : 
+<span class="highlight">contact@rasolo.fr</span>`,
+        };
+
+        inputField.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const cmd = this.value.trim().toLowerCase();
+                this.value = '';
+
+                if (cmd === 'clear') {
+                    historyDiv.innerHTML = '';
+                    return;
+                }
+
+                // Génération de l'affichage de la commande tapée
+                const promptLine = document.createElement('div');
+                promptLine.innerHTML = `<span class="prompt">guest@rasolo</span>:<span class="path">~</span>$ ${cmd}`;
+                historyDiv.appendChild(promptLine);
+
+                // Génération de la réponse
+                const responseLine = document.createElement('div');
+                responseLine.className = 'output';
+                
+                if (cmd === '') {
+                    responseLine.innerHTML = '';
+                } else if (commands[cmd]) {
+                    responseLine.innerHTML = commands[cmd];
+                } else {
+                    responseLine.innerHTML = `bash: ${cmd}: commande introuvable`;
+                }
+
+                historyDiv.appendChild(responseLine);
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        });
+
+        // Garder le focus sur l'input
+        document.addEventListener('click', () => {
+            inputField.focus();
+        });
+    </script>
+</body>
+</html>
