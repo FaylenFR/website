@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 | rasolo.fr</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{
+    background:#0a0806; color:#d8cdb8;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    min-height:100vh; margin:0;
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .box{max-width:520px; width:100%;}
+  .prompt{color:#ffb000; font-weight:600;}
+  .path{color:#7fb3ff; font-weight:600;}
+  .err{color:#ff6b5e;}
+  p{line-height:1.6;}
+  a{color:#ffb000; text-decoration:underline;}
+  .cursor{display:inline-block; width:9px; height:1.1em; background:#ffb000; vertical-align:-2px; animation:blink 1s step-end infinite;}
+  @keyframes blink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+</style>
+</head>
+<body>
+  <div class="box">
+    <p><span class="prompt">guest@rasolo</span><span class="path">:~$</span> cd <span id="p"></span></p>
+    <p class="err">bash: cd: page introuvable (404)</p>
+    <p>Cette page n'existe pas ou plus. <a href="/">Retour à l'accueil</a> — tapez <code>help</code> une fois sur place.</p>
+    <p><span class="cursor"></span></p>
+  </div>
+  <script>
+    document.getElementById('p').textContent = location.pathname;
+  </script>
+</body>
+</html>
