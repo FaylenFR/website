@@ -118,6 +118,22 @@
   .titlebar .tl-dot{width:10px;height:10px;border-radius:50%;background:#3a3226;}
   .titlebar span.name{margin-left:6px;}
 
+  .speed-btn{
+    margin-left:auto;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--fg-dim);
+    font:inherit;
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .speed-btn:hover, .speed-btn:focus-visible{
+    border-color:var(--amber-dim);
+    color:var(--amber);
+  }
+
   #log{white-space:pre-wrap;word-break:break-word;}
 
   .line{margin:0 0 2px;}
@@ -195,15 +211,69 @@
     input#cmd{font-size:16px;} /* avoid iOS zoom on focus */
   }
 
+  /* ---------- boot sequence ---------- */
+  #terminal{position:relative; overflow:hidden;}
+
+  #terminal::after{
+    content:"";
+    position:absolute; left:0; right:0; top:-20%;
+    height:20%;
+    background:linear-gradient(to bottom, transparent, rgba(255,176,0,0.05), transparent);
+    animation:scan 7s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes scan{
+    0%{top:-20%;}
+    100%{top:100%;}
+  }
+
+  .booting .cmdline,
+  .booting .chips,
+  .booting .hint{
+    opacity:0;
+    pointer-events:none;
+  }
+  .cmdline, .chips, .hint{
+    opacity:1;
+    transition:opacity .5s ease;
+  }
+
+  .boot-cursor::after{
+    content:"▌";
+    color:var(--amber);
+    animation:blink 1s step-end infinite;
+    margin-left:2px;
+  }
+  @keyframes blink{
+    0%,49%{opacity:1;}
+    50%,100%{opacity:0;}
+  }
+
+  .bar-track{color:var(--fg-dim);}
+  .bar-fill{color:var(--amber);}
+  .bar-pct{color:var(--fg);}
+
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+    #terminal::after{display:none;}
   }
 </style>
 </head>
 <body>
 
 <a class="skip-link" href="#cmd">Aller au terminal</a>
+
+<noscript>
+<style>
+  .visually-hidden{
+    position:static !important; width:auto !important; height:auto !important;
+    padding:20px !important; margin:0 auto !important; max-width:860px;
+    overflow:visible !important; clip:auto !important; white-space:normal !important;
+  }
+  #terminal{display:none;}
+</style>
+</noscript>
 
 <!--
   Contenu réel, sémantique, visible pour les moteurs de recherche et les
@@ -256,22 +326,21 @@
 </header>
 
 <main>
-  <div id="terminal" role="application" aria-label="Terminal interactif — portfolio de Lucas">
-    <div class="titlebar" aria-hidden="true">
-      <span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span>
-      <span class="name">guest@rasolo — bash — 80×24</span>
+  <div id="terminal" role="application" aria-label="Terminal interactif — portfolio de Lucas" class="booting">
+    <div class="titlebar">
+      <span aria-hidden="true"><span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span></span>
+      <span class="name" aria-hidden="true">guest@rasolo — bash — 80×24</span>
+      <button type="button" id="speedBtn" class="speed-btn" aria-label="Vitesse des animations : Normale. Cliquer pour changer.">
+        ⚡ <span id="speedLabel">Normale</span>
+      </button>
     </div>
 
-    <div id="log" aria-live="polite">
-      <div class="line boot">Initialisation de l'environnement… <span class="ok">OK</span></div>
-      <div class="line boot">Chargement du profil guest… <span class="ok">OK</span></div>
-      <div class="line boot">Tapez <span class="output hi" style="display:inline">help</span> pour voir les commandes, ou touchez un bouton ci-dessous sur mobile.</div>
-    </div>
+    <div id="log"></div>
 
     <form class="cmdline" id="cmdForm" autocomplete="off">
       <span class="prompt">guest@rasolo</span><span class="path">:~$</span>
       <label class="visually-hidden" for="cmd">Tapez une commande</label>
-      <input type="text" id="cmd" name="cmd" placeholder="help" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus>
+      <input type="text" id="cmd" name="cmd" placeholder="help" autocomplete="off" autocapitalize="off" spellcheck="false">
     </form>
 
     <div class="chips" aria-label="Commandes rapides">
@@ -320,6 +389,102 @@
     clock.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
   }
   tick(); setInterval(tick, 1000);
+
+  var terminalEl = document.getElementById('terminal');
+  var speedBtn = document.getElementById('speedBtn');
+  var speedLabel = document.getElementById('speedLabel');
+
+  // Speed is now fully user-controlled via the button — we stopped relying
+  // on prefers-reduced-motion for pacing: it was reporting "reduce" in
+  // environments where nothing was actually enabled, which made every
+  // animation skip straight to instant. Multiplier scales all delays;
+  // 0 means "as fast as the browser will render", not literally 0ms.
+  var SPEEDS = [
+    { key:'normal', label:'Normale', mult:1 },
+    { key:'slow',   label:'Lente',   mult:2.6 },
+    { key:'fast',   label:'Instantanée', mult:0.05 }
+  ];
+  var speedIndex = 0;
+  function speed(){ return SPEEDS[speedIndex]; }
+
+  speedBtn.addEventListener('click', function(){
+    speedIndex = (speedIndex + 1) % SPEEDS.length;
+    speedLabel.textContent = speed().label;
+    speedBtn.setAttribute('aria-label', 'Vitesse des animations : ' + speed().label + '. Cliquer pour changer.');
+  });
+
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, Math.max(0, ms * speed().mult)); }); }
+
+  function addRawLine(html, cls){
+    var div = document.createElement('div');
+    div.className = cls || 'line boot';
+    div.innerHTML = html;
+    logEl.appendChild(div);
+    return div;
+  }
+
+  function typeLine(text, badgeHTML){
+    return new Promise(function(resolve){
+      var div = document.createElement('div');
+      div.className = 'line boot boot-cursor';
+      logEl.appendChild(div);
+
+      var i = 0;
+      (function step(){
+        div.textContent = text.slice(0, i);
+        i++;
+        if (i <= text.length){
+          var d = (10 + Math.random() * 18) * speed().mult;
+          setTimeout(step, d);
+        } else {
+          div.classList.remove('boot-cursor');
+          if (badgeHTML){ div.innerHTML += ' ' + badgeHTML; }
+          resolve();
+        }
+      })();
+    });
+  }
+
+  // fake progress bar: "Label [██████░░░░] 100%"
+  function bar(label, duration){
+    return new Promise(function(resolve){
+      var div = addRawLine('', 'line boot');
+      var width = 22;
+      var steps = 16;
+      var n = 0;
+      var t = setInterval(function(){
+        n++;
+        var pct = Math.min(100, Math.round((n / steps) * 100));
+        var filled = Math.round((pct / 100) * width);
+        div.innerHTML = label + ' <span class="bar-track">[<span class="bar-fill">' +
+          '█'.repeat(filled) + '</span>' + '░'.repeat(width - filled) + ']</span> <span class="bar-pct">' + pct + '%</span>';
+        if (n >= steps){
+          clearInterval(t);
+          resolve();
+        }
+      }, Math.max(4, (duration / steps) * speed().mult));
+    });
+  }
+
+  async function bootSequence(){
+    await wait(150);
+    await typeLine('Connexion à rasolo.fr établie…', '<span class="ok">OK</span>');
+    await bar('Authentification invité', 550);
+    await bar('Montage des systèmes de fichiers', 650);
+    await typeLine('Interfaces réseau détectées : ', '<span class="hi">eth0</span>, <span class="hi">wg0</span>');
+    await bar('Résolution DNS (AdGuard Home)', 450);
+    await typeLine('Session prête.', '<span class="ok">OK</span>');
+    await wait(200);
+    await typeLine('Tapez ', '<span class="output hi" style="display:inline">help</span> pour voir les commandes, ou touchez un bouton ci-dessous sur mobile.');
+
+    terminalEl.classList.remove('booting');
+    input.removeAttribute('readonly');
+    input.focus();
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
+  input.setAttribute('readonly', 'readonly');
+  bootSequence();
 
   var NEOFETCH = [
     '     ___         ',
@@ -443,14 +608,32 @@
     }
   };
 
-  function printBlock(html, cls){
-    var div = document.createElement('div');
-    div.className = cls || 'output';
-    div.innerHTML = html;
-    logEl.appendChild(div);
+  // reveals a multi-line command response progressively, one line at a time
+  function printProgressive(html, cls){
+    return new Promise(function(resolve){
+      var container = document.createElement('div');
+      container.className = cls || 'output';
+      logEl.appendChild(container);
+
+      var lines = html.split('\n');
+      var i = 0;
+
+      (function step(){
+        if (i < lines.length){
+          var lineDiv = document.createElement('div');
+          lineDiv.innerHTML = lines[i] === '' ? '&nbsp;' : lines[i];
+          container.appendChild(lineDiv);
+          i++;
+          window.scrollTo(0, document.body.scrollHeight);
+          setTimeout(step, Math.max(4, 40 * speed().mult));
+        } else {
+          resolve();
+        }
+      })();
+    });
   }
 
-  function runCommand(raw){
+  async function runCommand(raw){
     var trimmed = raw.trim();
     var lower = trimmed.toLowerCase();
     var parts = lower.split(/\s+/);
@@ -470,15 +653,21 @@
       return;
     }
 
+    input.setAttribute('readonly', 'readonly');
+
     if (COMMANDS[name]){
-      printBlock(COMMANDS[name](arg));
+      await printProgressive(COMMANDS[name](arg));
     } else {
-      printBlock('bash: '+escapeHTML(name)+' : commande introuvable. Tapez <span class="hi">help</span>.', 'output err');
+      await printProgressive('bash: '+escapeHTML(name)+' : commande introuvable. Tapez <span class="hi">help</span>.', 'output err');
     }
+
+    input.removeAttribute('readonly');
+    input.focus();
   }
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
+    if (input.hasAttribute('readonly')){ return; }
     var val = input.value;
     if (val.trim() !== ''){
       history.push(val);
@@ -510,11 +699,11 @@
   // quick command chips (mobile / discoverability)
   document.querySelectorAll('.chip').forEach(function(btn){
     btn.addEventListener('click', function(){
+      if (input.hasAttribute('readonly')){ return; }
       var c = btn.getAttribute('data-cmd');
-      input.value = c;
       history.push(c); histIndex = history.length;
+      input.value = '';
       runCommand(c);
-      input.focus();
       window.scrollTo(0, document.body.scrollHeight);
     });
   });
